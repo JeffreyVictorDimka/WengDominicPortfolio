@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Izzy Concept — Cinematic Photography</title>
+
+<!-- Optional: Google font (fast) -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#060506;
+    --muted:#bdb8b8;
+    --gold:#c2a24b;
+    --glass: rgba(255,255,255,0.04);
+    --maxw:1200px;
+    --accent-glow: 0 10px 40px rgba(194,162,75,0.16);
+  }
+  /* reset */
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background:radial-gradient(1200px 600px at 10% 10%, rgba(200,170,80,0.04), transparent 10%),
+               radial-gradient(900px 400px at 90% 90%, rgba(150,120,220,0.03), transparent 10%),
+               var(--bg);
+    color:#fff;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    overflow-x:hidden;
+  }
+
+  /* PRELOADER */
+  #preloader{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);z-index:9999;
+  }
+  #preloader .logo{
+    text-align:center;opacity:0;animation:fadeIn .8s forwards .35s;
+  }
+  #preloader .logo h1{font-family:'Playfair Display', serif;font-size:28px;color:var(--gold);letter-spacing:2px}
+  #preloader .spinner{margin-top:14px;border:4px solid rgba(255,255,255,0.06);border-top-color:var(--gold);border-radius:50%;width:44px;height:44px;animation:spin 1s linear infinite}
+
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes fadeIn{to{opacity:1}}
+
+  /* NAV */
+  nav{
+    position:fixed;left:50%;transform:translateX(-50%);top:20px;z-index:1200;
+    width:min(92%,var(--maxw));display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:10px 16px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+    border:1px solid rgba(255,255,255,0.04);backdrop-filter: blur(8px) saturate(120%);box-shadow:var(--accent-glow)
+  }
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand .mark{
+    width:46px;height:46px;border-radius:8px;background:linear-gradient(135deg,#fff6d1,#d9b84a);display:flex;align-items:center;justify-content:center;color:#111;font-weight:700;font-family:'Playfair Display';font-size:18px;
+    box-shadow:0 8px 22px rgba(0,0,0,0.35)
+  }
+  .brand h2{font-size:14px;color:var(--muted);font-weight:600}
+  .navlinks{display:flex;gap:18px;align-items:center}
+  .navlinks a{color:rgba(255,255,255,0.85);text-decoration:none;font-weight:600;padding:8px 10px;border-radius:8px;transition:all .24s}
+  .navlinks a:hover{color:#111;background:var(--gold)}
+  .navlinks a.active{background:linear-gradient(90deg,var(--gold), #e6c75a);color:#111;box-shadow:0 10px 40px rgba(194,162,75,0.12)}
+
+  /* HERO (video) */
+  header.hero{
+    position:relative;height:100vh;display:flex;align-items:center;justify-content:center;padding-top:36px;overflow:hidden;
+  }
+  /* video - cover */
+  .bg-video{
+    position:absolute;inset:0;z-index:0;overflow:hidden;
+  }
+  .bg-video video{
+    width:100%;height:100%;object-fit:cover;filter:brightness(.46) contrast(1.06) saturate(.98);
+    transform:scale(1.04);
+  }
+  /* film grain overlay */
+  .grain{position:absolute;inset:0;background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><filter id="f"><feTurbulence baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23f)" opacity="0.03"/></svg>');mix-blend-mode:overlay;z-index:2;pointer-events:none}
+
+  /* cinematic vignette */
+  .vignette{position:absolute;inset:0;z-index:1;background:radial-gradient(60% 60% at 50% 35%, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 45%, rgba(0,0,0,0.72) 100%)}
+
+  /* hero content */
+  .hero-inner{position:relative;z-index:3;max-width:var(--maxw);width:100%;padding:30px;display:flex;gap:32px;align-items:center;justify-content:space-between}
+  .hero-left{flex:1;min-width:300px}
+  .kicker{color:var(--gold);font-weight:700;letter-spacing:2px;margin-bottom:8px}
+  .title{font-family:'Playfair Display',serif;font-size:64px;line-height:0.95;color:#fff;margin-bottom:12px;letter-spacing:1px; text-shadow: 0 18px 40px rgba(0,0,0,0.6)}
+  .subtitle{color:var(--muted);font-size:18px;max-width:620px;margin-bottom:22px}
+
+  /* animated trailer text (typed block reveal) */
+  .trailer{
+    display:flex;flex-direction:column;gap:10px;margin-top:18px;
+  }
+  .trailer .line{font-family:'Playfair Display';font-size:20px;color:rgba(255,255,255,0.92);opacity:0;transform:translateY(6px);animation:reveal .65s forwards;animation-delay:0s}
+  .trailer .line:nth-child(2){animation-delay:.35s}
+  .trailer .line:nth-child(3){animation-delay:.7s}
+  @keyframes reveal{to{opacity:1;transform:none}}
+
+  /* call to action */
+  .cta{margin-top:22px;display:flex;gap:12px}
+  .btn{
+    padding:12px 18px;border-radius:10px;border:0;font-weight:700;cursor:pointer;backdrop-filter: blur(6px);transition:transform .16s ease, box-shadow .18s;
+  }
+  .btn.primary{background:linear-gradient(90deg,var(--gold), #e6c75a);color:#111}
+  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+  .btn.primary:hover{transform:translateY(-6px);box-shadow:0 30px 60px rgba(194,162,75,0.12)}
+
+  /* right column film-strip preview */
+  .hero-right{width:420px;display:flex;flex-direction:column;gap:14px}
+  .strip{border-radius:12px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,0.6);background:linear-gradient(180deg, rgba(0,0,0,0.18),rgba(0,0,0,0.06));border:1px solid rgba(255,255,255,0.03)}
+  .strip img{width:100%;height:160px;object-fit:cover;display:block;transform:scale(1.03);transition:transform .9s}
+  .strip .meta{padding:14px;color:var(--muted);font-size:13px}
+
+  .strip:hover img{transform:scale(1.08)}
+
+  /* SCROLL INDICATOR */
+  .scroll-ind{position:absolute;left:50%;transform:translateX(-50%);bottom:28px;color:rgba(255,255,255,0.7);font-size:13px;z-index:40}
+
+  /* sections container */
+  main{position:relative;z-index:5;background:transparent}
+
+  /* PORTFOLIO */
+  .section{
+    max-width:var(--maxw);margin:0 auto;padding:84px 20px;display:block;
+  }
+  .section h3{font-family:'Playfair Display';font-size:28px;color:var(--gold);margin-bottom:14px}
+  .section p.lead{color:var(--muted);margin-bottom:22px;max-width:760px}
+
+  /* cinematic grid: variable heights */
+  .grid{
+    display:grid;grid-template-columns: repeat(4, 1fr);grid-auto-rows:200px;gap:16px;
+  }
+  .item{position:relative;overflow:hidden;border-radius:10px;cursor:pointer;transition:transform .4s, box-shadow .3s}
+  .item img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.06);transition:transform .8s ease,filter .3s}
+  .item .info{position:absolute;left:12px;bottom:12px;color:#fff;font-weight:700;text-shadow:0 10px 24px rgba(0,0,0,0.6);z-index:2}
+  .item:hover{transform:translateY(-8px);box-shadow:0 30px 60px rgba(0,0,0,0.5)}
+  .item:hover img{transform:scale(1.14);filter:brightness(1.04)}
+
+  /* variable sizes for drama */
+  .item.h-2{grid-row:span 2}
+  .item.w-2{grid-column:span 2}
+  .item.h-3{grid-row:span 3}
+
+  /* project modal (detail) */
+  .modal{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.86);z-index:1500;opacity:0;pointer-events:none;transition:opacity .24s;
+  }
+  .modal.open{opacity:1;pointer-events:auto}
+  .modal .panel{max-width:1000px;width:96%;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;display:flex;overflow:hidden}
+  .modal .left{flex:1;min-height:420px;position:relative}
+  .modal .left img{width:100%;height:100%;object-fit:cover}
+  .modal .right{width:360px;padding:22px;color:var(--muted)}
+  .modal .right h4{color:var(--gold);margin-bottom:12px}
+  .close-modal{position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.06);border-radius:8px;padding:8px 10px;color:#fff;cursor:pointer}
+
+  /* contact band */
+  .contact-band{padding:44px 20px;background:linear-gradient(90deg, rgba(194,162,75,0.06), rgba(255,255,255,0.02));text-align:center;margin-top:34px;border-radius:10px}
+  .contact-band h4{font-size:20px;margin-bottom:8px;color:#fff}
+  .contact-band p{color:var(--muted);margin-bottom:12px}
+  .contact-band a{background:var(--gold);color:#111;padding:12px 18px;border-radius:8px;font-weight:700;text-decoration:none}
+
+  /* footer */
+  footer{padding:34px 20px;text-align:center;color:rgba(255,255,255,0.6);font-size:14px}
+
+  /* responsive tweaks */
+  @media (max-width:1100px){
+    .grid{grid-template-columns: repeat(3,1fr)}
+    .hero-right{display:none}
+    .title{font-size:44px}
+  }
+  @media (max-width:760px){
+    nav{padding:8px 12px}
+    .hero-inner{flex-direction:column;gap:18px;padding:12px}
+    .title{font-size:30px;text-align:center}
+    .subtitle{text-align:center}
+    .grid{grid-template-columns: repeat(2,1fr)}
+    .item{min-height:160px}
+    .modal .panel{flex-direction:column}
+    .modal .right{width:100%;padding:16px}
+  }
+
+</style>
+</head>
+<body>
+
+  <!-- PRELOADER -->
+  <div id="preloader" aria-hidden="false">
+    <div class="logo" role="img" aria-label="Izzy Concept loading">
+      <h1>IZZY</h1>
+      <div class="spinner" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <nav role="navigation" aria-label="Main">
+    <div class="brand">
+      <div class="mark">IC</div>
+      <div><h2>Izzy Concept</h2></div>
+    </div>
+
+    <div class="navlinks">
+      <a href="#home" class="active">Home</a>
+      <a href="#portfolio">Work</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero" id="home" aria-labelledby="heroTitle">
+    <div class="bg-video" aria-hidden="true">
+      <!-- Replace 'hero-video.mp4' with your video file (H.264 mp4 recommended). Provide web-safe fallback images if needed -->
+      <video autoplay muted loop playsinline preload="metadata">
+        <source src="WengDom.mp4" type="video/mp4">
+        <!-- fallback poster if video unsupported -->
+      </video>
+    </div>
+
+    <div class="grain" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <div class="hero-inner">
+      <div class="hero-left">
+        <div class="kicker">FEATURED — 2025</div>
+        <h1 id="heroTitle" class="title">Izzy Concept Photography</h1>
+        <p class="subtitle">Cinematic portraits • fashion editorials • event storytelling — shot with care, edited with cinematic color.</p>
+
+        <div class="trailer" aria-hidden="false">
+          <div class="line">• THE LENS FINDS THE MOMENT</div>
+          <div class="line">• LIGHT SHAPES THE MOOD</div>
+          <div class="line">• STORIES ARE CAPTURED, NOT STAGED</div>
+        </div>
+
+        <div class="cta">
+          <button class="btn primary" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Book a Session</button>
+          <button class="btn ghost" onclick="document.getElementById('portfolio').scrollIntoView({behavior:'smooth'})">View Work</button>
+        </div>
+      </div>
+
+      <div class="hero-right" aria-hidden="true">
+        <div class="strip">
+          <img src="Izzy3.jpg" alt="Studio portrait sample">
+          <div class="meta">Studio</div>
+        </div>
+        <div class="strip">
+          <img src="Izzy22.jpg" alt="Fashion sample">
+          <div class="meta">Fashion </div>
+        </div>
+        <div class="strip">
+          <img src="event.jpg" alt="Event sample">
+          <div class="meta">Events </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-ind">Scroll to explore ↓</div>
+  </header>
+
+  <!-- MAIN -->
+  <main>
+    <!-- PORTFOLIO -->
+    <section id="portfolio" class="section" aria-labelledby="portfolioTitle">
+      <h3 id="portfolioTitle">Selected Work</h3>
+      <p class="lead">A curated selection of recent projects — click any image to view the story, gear, and color approach behind it.</p>
+
+      <div class="grid" id="gallery">
+        <!-- Replace image src with yours. Add or remove classes h-2, w-2 etc for layout drama -->
+        <div class="item h-2 w-2" data-title="Editorial: Golden Hour" data-desc="Fashion editorial shot in Lagos. Canon R5, 50mm. Color grade: warm film." tabindex="0"><img src="Izzy23.jpg" alt="Editorial Golden Hour"><div class="info">Editorial</div></div>
+
+        <div class="item" data-title="Studio Portrait" data-desc="Minimal studio portrait with softbox. Sony A7III, 85mm." tabindex="0"><img src="IMG_0582a.jpg" alt="Studio Portrait"><div class="info">Studio</div></div>
+
+        <div class="item h-3" data-title="Event: Opening Night" data-desc="Event highlights and speaker portraits. Canon 5D Mark IV." tabindex="0"><img src="IMG_4466_1a.jpg" alt="Event Opening Night"><div class="info">Event</div></div>
+
+        <div class="item w-2" data-title="Street Fashion" data-desc="Street fashion series. Leica SL2, 35mm." tabindex="0"><img src="Izzy24.jpg" alt="Street Fashion"><div class="info">Street</div></div>
+
+        <div class="item" data-title="Couples" data-desc="Candid couples shoot. Nikon Z6." tabindex="0"><img src="Izzy2.jpg" alt="Couples"><div class="info">Candid </div></div>
+
+        <div class="item" data-title="Portfolio — Black & Gold" data-desc="Experimental portrait emphasizing dramatic shadows." tabindex="0"><img src="Izzy13.jpg" alt="Black & Gold"><div class="info">Portrait</div></div>
+
+        <div class="item h-2" data-title="Commercial: Product" data-desc="Product & styling for local brand." tabindex="0"><img src="Izzy10.jpg" alt="Product"><div class="info">Commercial</div></div>
+
+        <div class="item" data-title="Documentary Frame" data-desc="Behind-the-scenes, documentary moment." tabindex="0"><img src="Izzy55.jpg" alt="Documentary"><div class="info">Documentary</div></div>
+      </div>
+
+      <div class="contact-band" id="about">
+        <h4>About Izzy</h4>
+        <p>Izzy is a cinematic photographer based in Jos. He crafts stories through portraiture and editorial work with emphasis on color and mood.
+            At IzzyConcept Photography, every shot is more than just a picture, it's a story frozen in time. From portraits to events and brand visuals, every shot is designed to inspire and connect.
+        </p>
+        <p style="margin-top:8px"><strong>Gear:</strong> Mirrorless bodies • primes • on-location lighting • DaVinci + Premiere</p>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="section" aria-labelledby="contactTitle">
+      <h3 id="contactTitle">Book & Collaborate</h3>
+      <p class="lead">Available for editorials, events, portraits and brand work. I reply within 24 hours.</p>
+      <div style="text-align:center;margin-top:18px">
+        <a href="mailto:dominicisrael50@gmail.com" class="btn primary" style="padding:14px 22px">Email: dominicisrael50@gmail.com</a>
+      </div>
+      <div style="text-align: center;margin-top: 40px">
+        <a href="https://wa.me/2349072150764" class="btn primary" style="padding: 14px 22px">Chat on WhatsApp</a>
+      </div>
+      <div style="text-align: center;margin-top: 60px">
+        <a href="https://www.instagram.com/izzyconcept_photography?igsh=eGVzYzFndjB6cnlw" class="btn primary" style="padding: 14px 22px">Chat on Instagram</a>
+      </div>
+    </section>
+
+    <footer>
+      © <span id="year"></span> Izzy Concept — Cinematic Photography • Crafted with intention
+    </footer>
+  </main>
+
+  <!-- PROJECT MODAL / LIGHTBOX -->
+  <div class="modal" id="modal" aria-hidden="true" role="dialog" aria-labelledby="modalTitle">
+    <div class="panel" role="document">
+      <button class="close-modal" id="closeModal" aria-label="Close">✕</button>
+      <div class="left"><img src="" alt="" id="modalImg"></div>
+      <div class="right">
+        <h4 id="modalTitle">Title</h4>
+        <p id="modalDesc" style="color:var(--muted)"></p>
+        <p style="margin-top:14px;color:var(--muted)">Gear & notes available on request.</p>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // basic preload hide
+  window.addEventListener('load', ()=> {
+    const pre = document.getElementById('preloader');
+    pre.style.transition = 'opacity .5s'; pre.style.opacity=0;
+    setTimeout(()=>pre.remove(),600);
+  });
+
+  // nav active state based on scroll
+  const navLinks = document.querySelectorAll('.navlinks a');
+  const sections = {
+    home: document.getElementById('home'),
+    portfolio: document.getElementById('portfolio'),
+    about: document.getElementById('about'),
+    contact: document.getElementById('contact')
+  };
+  const setActive = ()=>{
+    const y = window.scrollY + window.innerHeight/3;
+    if(y < sections.portfolio.offsetTop) highlight('home');
+    else if(y < sections.about.offsetTop) highlight('portfolio');
+    else if(y < sections.contact.offsetTop) highlight('about');
+    else highlight('contact');
+  };
+  function highlight(id){
+    navLinks.forEach(a=>a.classList.toggle('active', a.getAttribute('href') === '#'+id));
+  }
+  window.addEventListener('scroll', setActive, {passive:true});
+  setActive();
+
+  // smooth links (extra)
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click', (e)=>{
+      e.preventDefault();
+      document.querySelector(a.getAttribute('href')).scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  });
+
+  // Gallery: open modal with image + details
+  const items = document.querySelectorAll('.grid .item');
+  const modal = document.getElementById('modal');
+  const modalImg = document.getElementById('modalImg');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalDesc = document.getElementById('modalDesc');
+
+  items.forEach(it=>{
+    it.addEventListener('click', ()=> openItem(it));
+    it.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') openItem(it) });
+  });
+
+  function openItem(it){
+    const img = it.querySelector('img');
+    modalImg.src = img.src;
+    modalImg.alt = img.alt || '';
+    modalTitle.textContent = it.dataset.title || 'Project';
+    modalDesc.textContent = it.dataset.desc || '';
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden','false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  document.getElementById('closeModal').addEventListener('click', closeModal);
+  modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); });
+  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal() });
+
+  function closeModal(){
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden','true');
+    document.body.style.overflow = '';
+    modalImg.src = '';
+  }
+
+  // set year
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>
